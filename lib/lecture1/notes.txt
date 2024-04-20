@@ -1,0 +1,214 @@
+
+
+Software Downloadable links:
+
+1: Xampp for local database
+https://www.apachefriends.org/download.html
+
+
+
+
+
+Flutter Notes Common:
+
+
+
+Lecture 2:
+1: flutter create project command
+flutter create capstone_project
+
+2: design a simple login page
+
+3: use a package to communicate with mysql database (https://pub.dev/packages/mysql1)
+
+4: install this package using command
+dart pub add mysql1
+
+
+5: i have created a database using [http://localhost/phpmyadmin/index.php?lang=en_GB]
+
+database name: iqra_college
+database table: user
+
+
+i have created a new user from [http://localhost/phpmyadmin/index.php?route=/server/privileges&viewing_mode=server]
+database access : 
+
+connection String: 
+      host: 'localhost',
+      port: 3306,
+      user: 'sami',
+      password: '1234',
+      db: 'iqra_college'
+
+
+full flutter code:
+
+main file code:
+
+START
+________________________________________________________________
+
+
+import 'package:flutter/material.dart';
+import 'package:mysql1/mysql1.dart';
+
+void main() {
+  runApp(const CRUDAPPSQL());
+}
+
+class CRUDAPPSQL extends StatefulWidget {
+  const CRUDAPPSQL({super.key});
+
+  @override
+  State<CRUDAPPSQL> createState() => _CRUDAPPSQLState();
+}
+
+class _CRUDAPPSQLState extends State<CRUDAPPSQL> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'SQL',
+      home: LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  String userName = '';
+  String password = '';
+
+  var settings =  ConnectionSettings(
+      host: 'localhost',
+      port: 3306,
+      user: 'sami',
+      password: '1234',
+      db: 'iqra_college'
+  );
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'SQL CRUD',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blue,
+      ),
+      body: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Center(
+              child: Text(
+                'Login Page',
+                style: TextStyle(color: Colors.blue, fontSize: 24),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('User Email'),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    onChanged: (v) {
+                      userName = v;
+                    },
+                  ),
+                )
+              ],
+            ),
+
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Password'),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    onChanged: (v) {
+                      password = v;
+                    },
+                  ),
+                )
+              ],
+            ),
+
+            SizedBox(
+              height: 30,
+            ),
+            TextButton(
+                onPressed: () async{
+                  String message='User name = $userName and password = $password';
+
+
+                  var conn = await MySqlConnection.connect(settings);
+
+
+                  var results = await conn.query('select * from user where email = ? And password = ?', [userName,password]);
+
+                  if(results.isNotEmpty){
+                    message='Successfully Login\n${results}\n\n';
+                    showSimpleToast(context: context, message: message);
+                  }else{
+                    message='Failed Login\nWrong email or Password';
+                    showSimpleToast(context: context, message: message);
+                  }
+
+
+
+                },
+                child: Text('Submit'))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+void showSimpleToast({required BuildContext context, required String message}) {
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(SnackBar(
+    content: Text("${message}"),
+  ));
+}
+
+
+
+
+________________________________________________________________
+END
+
+
+pubspec.yml dependcies
+mysql1: ^0.20.0
+
+
+
+
+
+
+
+
+
+
+
